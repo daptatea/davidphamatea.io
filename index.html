@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
             background-color: #f4f4f4;
             height: 100%;
         }
- 
+
         /* Floating Action Button (FAB) style */
         #openBtn {
             position: fixed;
@@ -35,12 +35,12 @@
             z-index: 10000;
             transition: transform 0.3s ease, background-color 0.3s ease;
         }
- 
+
         #openBtn:hover {
             transform: scale(1.1);
             background-color: #005bb5;
         }
- 
+
         /* Iframe container */
         #iframeContainer {
             display: none;
@@ -58,13 +58,13 @@
             display: flex;
             flex-direction: column;
         }
- 
+
         #myIframe {
             width: 100%;
             height: calc(100% - 50px);
             border: none;
         }
- 
+
         /* Header with close and minimize buttons */
         #iframeHeader {
             display: flex;
@@ -76,7 +76,7 @@
             height: 50px;
             box-sizing: border-box;
         }
- 
+
         #iframeHeader button {
             background-color: transparent;
             border: none;
@@ -85,21 +85,21 @@
             font-size: 18px;
             transition: color 0.3s ease;
         }
- 
+
         #iframeHeader button:hover {
             color: #ddd;
         }
- 
+
         #iframeHeader .header-title {
             font-size: 16px;
             font-weight: bold;
         }
- 
+
         /* Minimized state for iframe container */
         #iframeContainer.minimized {
             height: 50px;
         }
- 
+
         /* Webchat container */
         #webchat {
             height: calc(100% - 50px);
@@ -108,11 +108,11 @@
         }
     </style>
 </head>
- 
+
 <body>
     <p>David tester og failer med sin egen nettside</p>
-   
- 
+    
+
     <!-- Floating Action Button to open the chat -->
     <button id="openBtn">💬</button>
     <textarea placeholder="Skriv noe her" style="width: 300px; height: 40px; font-size: 16px; overflow-y: hidden;" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
@@ -127,34 +127,34 @@
         </div>
         <div id="webchat" role="main"></div>
     </div>
- 
+
     <!-- Include the Web Chat script -->
-    <script crossorigin="anonymous" src=https://cdn.botframework.com/botframework-webchat/latest/webchat.js></script>
- 
+    <script crossorigin="anonymous" src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+
     <script>
         // Get the elements
         const openBtn = document.getElementById('openBtn');
         const closeBtn = document.getElementById('closeBtn');
         const minimizeBtn = document.getElementById('minimizeBtn');
         const iframeContainer = document.getElementById('iframeContainer');
- 
+
         // When the open button is clicked
         openBtn.addEventListener('click', function () {
             iframeContainer.style.display = 'flex';
             openBtn.style.display = 'none'; // Hide the open button
         });
- 
+
         // When the close button is clicked
         closeBtn.addEventListener('click', function () {
             iframeContainer.style.display = 'none';
             openBtn.style.display = 'flex'; // Show the open button
         });
- 
+
         // When the minimize button is clicked
         minimizeBtn.addEventListener('click', function () {
             iframeContainer.classList.toggle('minimized');
         });
- 
+
         // Initialize Web Chat
         (async function () {
             const styleOptions = {
@@ -162,23 +162,25 @@
                 botAvatarBackgroundColor: '#FFFFFF',
                 botAvatarImage: 'https://learn.microsoft.com/azure/bot-service/v4sdk/media/logo_bot.svg',
                 botAvatarInitials: 'BT',
-                userAvatarImage: 'https://avatars.githubusercontent.com/u/661465',
-               
+                userAvatarImage: 'https://learn.microsoft.com/azure/bot-service/v4sdk/media/logo_bot.svg',
+                userAvatarInitials: 'US',
+                hideUploadButton: true // Hide the upload button
             };
- 
+
             const tokenEndpointURL = new URL('https://defaulta9b1388299a64b289368b64c69bf02.56.environment.api.powerplatform.com/powervirtualagents/botsbyschema/crb3c_copilotForskningsradetsNettside/directline/token?api-version=2022-03-01-preview');
- 
+
+
             const locale = document.documentElement.lang || 'en';
- 
+
             const apiVersion = tokenEndpointURL.searchParams.get('api-version');
- 
+
             const [directLineURL, token] = await Promise.all([
                 fetch(new URL(`/powervirtualagents/regionalchannelsettings?api-version=${apiVersion}`, tokenEndpointURL))
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Failed to retrieve regional channel settings.');
                         }
- 
+
                         return response.json();
                     })
                     .then(({ channelUrlsById: { directline } }) => directline),
@@ -187,14 +189,14 @@
                         if (!response.ok) {
                             throw new Error('Failed to retrieve Direct Line token.');
                         }
- 
+
                         return response.json();
                     })
                     .then(({ token }) => token)
             ]);
- 
+
             const directLine = WebChat.createDirectLine({ domain: new URL('v3/directline', directLineURL), token });
- 
+
             const subscription = directLine.connectionStatus$.subscribe({
                 next(value) {
                     if (value === 2) {
@@ -206,15 +208,15 @@
                                 type: 'event'
                             })
                             .subscribe();
- 
+
                         subscription.unsubscribe();
                     }
                 }
             });
- 
+
             WebChat.renderWebChat({ directLine, locale, styleOptions }, document.getElementById('webchat'));
         })();
     </script>
 </body>
- 
+
 </html>
